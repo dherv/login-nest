@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/app
+    ports:
+      - 4000:3000
+    depends_on:
+      - database
+    environment:
+      - 'DB_PORT=3306'
+      - 'DB_HOST=database'
+  # The Database
+  database:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - dbdata:/var/lib/mysql:cached
+    environment:
+      - 'MYSQL_DATABASE=test'
+      - 'MYSQL_USER=root'
+      - 'MYSQL_ROOT_PASSWORD=root'
+    ports:
+      - 33062:3306
+volumes:
+  dbdata:
