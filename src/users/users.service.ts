@@ -1,32 +1,38 @@
-import { Injectable } from '@nestjs/common';
-
-export type User = any;
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './users.entity';
+import { Repository } from 'typeorm';
+import { BCryptService } from '../auth/bcrypt.service';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[];
-
-  constructor() {
-    this.users = [
-      {
-        userId: 1,
-        username: 'john',
-        password: 'changeme',
-      },
-      {
-        userId: 2,
-        username: 'chris',
-        password: 'secret',
-      },
-      {
-        userId: 3,
-        username: 'maria',
-        password: 'guess',
-      },
-    ];
-  }
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly bCryptService: BCryptService,
+  ) {}
 
   async findOne(username: string): Promise<User | undefined> {
-    return this.users.find(user => user.username === username);
+    const user = this.userRepository.findOne({ where: { username } });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  async findOneWithPassword(username: string): Promise<User | undefined> {
+    const user = this.userRepository.findOne({
+      where: { username },
+      select: ['id', 'username', 'password'],
+    });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  async create(user: User): Promise<User> {
+    user.password = await this.bCryptService.hash(user.password);
+    return this.userRepository.save(user);
   }
 }
