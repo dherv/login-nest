@@ -21,7 +21,7 @@ export class UsersService {
   }
 
   async findOneWithPassword(username: string): Promise<User | undefined> {
-    const user = this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { username },
       select: ['id', 'username', 'password'],
     });
