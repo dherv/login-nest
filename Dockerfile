@@ -1,6 +1,6 @@
 FROM node:13.10.1
 
-RUN npm install -g @nestjs/cli
+# RUN npm install -g @nestjs/cli
 
 # WORKDIR /usr/
 WORKDIR /usr/app/
@@ -11,7 +11,8 @@ COPY . ./
 
 # # Install the packages
 RUN npm install
-RUN npm audit fix --force
+# RUN npm audit fix --force
+RUN npm run build
 
 EXPOSE 3000
 

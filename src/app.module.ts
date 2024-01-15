@@ -11,9 +11,19 @@ import { BCryptService } from './auth/bcrypt.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(),
-    TypeOrmModule.forFeature([User]),
     ConfigModule.forRoot(),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'database',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'test',
+      entities: ['dist/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
+    TypeOrmModule.forFeature([User]),
+
     AuthModule,
     UsersModule,
   ],
